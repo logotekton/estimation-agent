@@ -2,63 +2,56 @@
 
 ## 지금까지 한 일
 
+### 세션 1 (클라우드 환경)
 건설공사 도면 기반 물량산출(BOQ) 자동화 시스템의 아키텍처·로드맵을 기획했다.
-초기 스케치(v1)를 독립 리뷰어 2인(지속 토론 리뷰어 1인 + 이력 없는 제3 리뷰어 1인)과
-**5라운드 적대적 토론**을 거쳐 고도화했고, 양측이 "이견 없음"을 선언한 시점에 종료했다.
+초기 스케치(v1)를 Claude 독립 리뷰어 2인(지속 토론 리뷰어 1인 + 이력 없는 제3 리뷰어 1인)과
+적대적 토론 4라운드+중간 1회(총 5세션)를 거쳐 고도화했고, 양측 "이견 없음" 시점에 종료.
+당시 Codex CLI 교차검증은 클라우드 환경의 네트워크 정책(OpenAI 도메인 차단)으로 불가했다.
 
-**결과물**: `docs/estimation-automation-plan.md` (브랜치 `claude/construction-estimate-automation-0rfgkl`,
-커밋 `f33ddad`, 이미 원격 푸시 완료)
+### 세션 2 (로컬 Windows 환경, 2026-07-12)
+로컬 환경에는 Codex CLI(winget 설치, ChatGPT 로그인)가 이미 있어 네트워크 차단 이슈가
+해소됨 → **실제 Codex CLI(gpt-5.5, reasoning xhigh)와 8라운드 교차검증 토론 완료**.
+- 사용자 지정 "sol ultra" 모델은 ChatGPT 계정 미지원 → gpt-5.5 xhigh(계정 내 최상위)로 진행.
+- Codex는 웹 검색 근거(LibreDWG 공식 문서, FSF GPL FAQ, ODA 가격, FDA NI 가이드,
+  Togal/Kreo 제품 페이지)를 인용하며 리뷰 — 치명 3건·중요 3건·사소 3건 발굴.
+- Claude 자체 재검토 논점 8건(C-1~C-8)도 토론에 투입, Codex 전건 승복.
+- 프리모템 라운드에서 신규 사인 5건(채택 실패·경쟁 압축·재무·키맨·UI 수렁) 발굴.
+- 역방향 점검(토론 자체의 과잉 수정 여부)까지 수행 후 **양측 조건 없는 "이견 없음"으로 종료**.
 
-문서 구성: 목표·성공지표(§0) → 핵심 아키텍처 결정(§1) → 타깃 고객·사업 가설(§2) →
-입력 계층(§3) → 파이프라인(§4) → 도면 밖 공종(§5) → 검토 UI(§6) → 디스크레펀시 리포트(§7) →
-평가 체계(§8) → 데이터·법무·책임(§9) → 팀·기간(§10) → 로드맵(§11) → 출력 규격(§12) →
-**부록 A: 4라운드 토론 이력 요약 + 기각된 초기 아이디어 목록**
+**결과물**:
+- `docs/estimation-automation-plan.md` — 최종 계획서 (Codex 교차검증 반영, 부록 B 추가)
+- `docs/codex-debate-log.md` — 토론 요약 로그
+- `docs/codex-debate/01~17-*.md` — 라운드별 원문 전문 (시간순)
 
 ## 핵심 결론 (원 질문: 도면 파싱 vs 자동 3D 모델링)
 
 양자택일이 아니라 **"도면 파싱 → 지오메트리 없는 경량 시맨틱 모델 → 룰 기반 물량산출"**의
-중간 경로가 정답. 근거는 문서 §1과 부록 A에 상세.
+중간 경로가 정답. 근거는 계획서 §1과 부록 A·B에 상세.
+
+## Codex 교차검증으로 추가된 주요 변경 (요약)
+
+- 벡터 PDF 등급 분리(SHX 아웃라인화 리스크), DWG 스파이크 수치 기준 + 2단 게이트
+- GPL 문구 교정(방어 논리 존재, 법무 검토는 온프레미스 유료 파일럿 계약 전) + ODA 원가 반영
+- 평가 통계 설계 신설(클러스터 CI·δ 사전 지정·검정력 게이트·masked adjudication·주장 한계)
+- gold/silver GT 분리, 철근 2a 판정 제외, 룰팩 거버넌스(precedence·골든 테스트·승인권자)
+- 프리모템: 엑셀 퍼스트 산출물·채택 KPI / 해자 검증 게이트 / 재무·상업 게이트 /
+  키맨 2인 체계 / UI 금지 목록
 
 ## 완료된 것 / 아직 안 한 것
 
-**완료**: 계획 수립·검증·문서화. 이건 순수 기획 문서이며 **코드는 아직 한 줄도 없다**
-(리포지토리가 원래 빈 상태였음).
+**완료**: 계획 수립 → Claude 2인 토론 검증 → 실제 Codex 교차검증 → 최종 문서화.
+**코드는 아직 한 줄도 없다.**
 
-**§11 로드맵의 0단계(다음 실행 단계)**:
-- DWG 변환 스파이크 (LibreDWG 충실도 검증, N=50 실무 도면 기준)
-- 검토 UI 뷰어 빌드/바이 스파이크 (두 스파이크는 결합 매트릭스로 함께 판단 — §6 참조)
-- 병렬 트랙: GT(ground truth) 1차 웨이브 발주, 적산 전문가 채용, 파일럿 파트너 계약
+**다음 실행 단계 (§11 로드맵 0단계 + 병렬 트랙)**:
+- DWG 변환 스파이크 (0A: N=5~10 경로 결정 → 0B: N=10~20 smoke 정량 리포트 → full N=50은 2a 병행, 수치 판정 기준은 §11 참조)
+- 벡터 PDF 텍스트 추출율 검증 (같은 스파이크)
+- 검토 UI 뷰어 빌드/바이 스파이크 (첫 2주 내 결론, DWG 스파이크와 결합 매트릭스)
+- 병렬: GT 1차 웨이브 발주 / 도면 소싱(NDA·협력사 채널) / 적산 전문가·CAD 파싱 엔지니어
+  채용 / 파일럿 파트너 계약 / 구매 경제 인터뷰 / 재무 숫자 확정(§10 재무·상업 게이트)
 
-## 미해결 이슈 — Codex CLI 인증 차단 (이번 세션에서 미완료)
+## 환경 메모
 
-사용자가 "codex cli sol ultra와 토론하라"고 요청했으나, 이 환경에 Codex CLI 인증 세션이
-없어 대신 Claude 서브에이전트 2인으로 적대적 토론을 대체 진행했다 (결과 자체는 완료·검증됨).
-
-Codex 인증을 별도로 시도했으나 **네트워크 정책 차단**으로 실패:
-```
-$ npm install -g @openai/codex   # 설치는 성공 (codex-cli 0.144.1)
-$ codex login --device-auth
-Error logging in with device code: error sending request for url
-  (https://auth.openai.com/api/accounts/deviceauth/usercode)
-```
-프록시 상태(`curl $HTTPS_PROXY/__agentproxy/status`)에서 `auth.openai.com`,
-`api.openai.com`, `chatgpt.com` 세 도메인 모두 `connect_rejected` / **정책 거부(403)**로
-명시적으로 확인됨. TLS나 설정 문제가 아니라 이 환경(Environment)의 네트워크 정책이
-OpenAI 도메인을 허용 목록에서 막고 있는 것.
-
-**새 세션에서 필요한 조치**:
-1. claude.ai/code에서 이 프로젝트의 Environment 설정 → 네트워크 정책 확인
-2. `auth.openai.com` / `api.openai.com` / `chatgpt.com`을 허용 목록에 추가하거나
-   "Unrestricted" 정책으로 변경
-3. 정책 변경은 컨테이너 재시작 후 적용되는 경우가 많으므로, 변경 후 **새 세션**에서
-   `codex login --device-auth` 재시도
-4. 인증되면 디바이스 코드가 나오고, 사용자가 브라우저에서 그 코드를 입력하는 방식
-   (API 키를 채팅에 직접 붙여넣을 필요 없음)
-
-## 다음 세션에서 할 수 있는 것
-
-- Codex 인증이 열리면, 완성된 계획서(`docs/estimation-automation-plan.md`)를 Codex에게
-  검토시켜 (진짜) Codex와의 교차검증을 추가로 받을 수 있음 — 다만 Claude 2인 토론이 이미
-  충분히 엄격했으므로 필수는 아니고 선택 사항.
-- 또는 계획을 실행 단계로 넘겨 0단계 스파이크(DWG 파싱 PoC, 부재 모델 스키마 v0)
-  코드 작업을 시작.
+- 로컬 Codex CLI: `C:\Users\HER\AppData\Local\Microsoft\WinGet\Packages\OpenAI.Codex_Microsoft.Winget.Source_8wekyb3d8bbwe\codex-x86_64-pc-windows-msvc.exe`
+  (`codex login status` = ChatGPT 로그인 상태). 토론 세션 재개:
+  `codex exec resume 019f5507-4ca5-7711-b844-0870992e7d88`
+- 이전 세션의 "Codex 네트워크 차단" 이슈는 클라우드 Environment 한정 — 로컬에서는 해당 없음.
